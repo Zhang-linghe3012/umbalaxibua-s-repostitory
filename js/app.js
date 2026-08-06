@@ -33,7 +33,7 @@
   }
 
   /* ===== Product card ===== */
-  function productCard(b){
+  function bookCard(b){
     const off = discountOf(b);
     return `<div class="product-card" data-detail="${b.id}">
       ${off ? `<span class="discount-tag">-${off}%</span>` : ""}
