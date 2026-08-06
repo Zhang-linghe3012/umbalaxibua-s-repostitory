@@ -24,6 +24,7 @@
         <a href="#" data-nav="contact">Liên hệ</a>
       </nav>
       <div class="header-actions">
+        <button class="hamburger" id="btnMenu" aria-label="Menu">☰</button>
         <button class="icon-btn" id="btnSearch" title="Tìm kiếm">🔍</button>
         <a href="#" class="icon-btn" data-nav="orders" title="Đơn hàng">📦</a>
         <button class="icon-btn" id="btnCart" title="Giỏ hàng">🛒<span class="badge" id="cartCount">0</span></button>
@@ -31,6 +32,15 @@
       </div>
     </div>
   </header>
+
+  <!-- ===== MENU MOBILE ===== -->
+  <nav class="mobile-nav" id="mobileNav" hidden>
+    <a href="#" data-nav="home">🏠 Trang chủ</a>
+    <a href="#" data-nav="products">📚 Sản phẩm</a>
+    <a href="#" data-nav="about">ℹ️ Về chúng tôi</a>
+    <a href="#" data-nav="contact">📞 Liên hệ</a>
+    <a href="#" data-nav="orders">📦 Đơn hàng</a>
+  </nav>
 
   <!-- ===== SEARCH BAR ===== -->
   <div class="search-bar" id="searchBar" hidden>
@@ -63,6 +73,12 @@
       </div>
 
       <div class="category-strip" id="categoryStrip"></div>
+
+      <div class="section-head">
+        <h2>Sản phẩm đề xuất</h2>
+        <a href="#" data-nav="products">Xem tất cả →</a>
+      </div>
+      <div class="product-grid" id="recGrid"></div>
 
       <div class="section-head">
         <h2>Sách nổi bật</h2>

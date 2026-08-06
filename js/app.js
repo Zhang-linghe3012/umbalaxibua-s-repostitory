@@ -61,6 +61,27 @@
   }
 
   /* ===== Home ===== */
+  function renderRecommended(){
+    const books = S.getBooks();
+    const u = S.currentUser();
+    const bought = [];
+    const cats = [];
+    S.getOrders().filter(o => u && o.userId === u.id).forEach(o => o.items.forEach(i => {
+      bought.push(i.id);
+      const b = S.findBook(i.id); if(b) cats.push(b.category);
+    }));
+    let rec = [];
+    if(cats.length){
+      rec = books.filter(b => cats.includes(b.category) && b.stock>0 && !bought.includes(b.id));
+    }
+    if(rec.length < 8){
+      const used = new Set(rec.map(b=>b.id));
+      rec = rec.concat(books.slice().sort((a,b)=>(b.rating||0)-(a.rating||0)).filter(b=>b.stock>0 && !used.has(b.id)));
+    }
+    $("recGrid").innerHTML = rec.slice(0,8).map(bookCard).join("");
+    bindProduct($("recGrid"));
+  }
+
   function renderHome(){
     const books = S.getBooks();
     $("categoryStrip").innerHTML = `<span class="cat-pill active" data-cat="all">Tất cả</span>` +
@@ -77,6 +98,7 @@
     bindProduct($("featuredGrid"));
     $("saleGrid").innerHTML = books.filter(b=>discountOf(b)>0).map(bookCard).join("");
     bindProduct($("saleGrid"));
+    renderRecommended();
   }
 
   /* ===== Products ===== */
@@ -274,6 +296,33 @@
 
   /* ===== Bind UI ===== */
   function bindUI(){
+    // ===== Điều hướng (Trang chủ / Sản phẩm / Về chúng tôi / Liên hệ / Đơn hàng) =====
+    document.addEventListener("click", e => {
+      const navA = e.target.closest("[data-nav]");
+      if(navA){
+        e.preventDefault();
+        const v = navA.dataset.nav;
+        const mn = $("mobileNav"); if(mn) mn.hidden = true;
+        if(v==="orders"){
+          if(!S.currentUser()){ toast("Vui lòng đăng nhập để xem đơn hàng", true); openAuth("login"); return; }
+          showView("orders"); return;
+        }
+        if(v==="home"){
+          $("filterCategory").value="all"; $("filterPrice").value="all"; $("sortBy").value="default"; $("onlySale").checked=false;
+        }
+        showView(v);
+        return;
+      }
+      const act = e.target.closest("[data-action]");
+      if(act){
+        e.preventDefault();
+        if(act.dataset.action==="open-register") openAuth("register");
+        return;
+      }
+    });
+    // ===== Menu mobile =====
+    $("btnMenu").addEventListener("click", () => { const m=$("mobileNav"); if(m) m.hidden = !m.hidden; });
+
     // search
     $("btnSearch").onclick = ()=> $("searchBar").hidden = !$("searchBar").hidden;
     function doSearch(){ rq = $("searchInput").value.trim().toLowerCase(); showView("products"); }
