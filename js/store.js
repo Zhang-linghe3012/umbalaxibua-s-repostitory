@@ -24,31 +24,65 @@ const Store = (() => {
   const deleteBook = id => saveBooks(getBooks().filter(b => b.id !== id));
 
   /* ---------- USERS / AUTH ---------- */
+  const isSupabase = () => !!(window.SupabaseAuth && window.SupabaseAuth.ready);
+
   const getUsers = () => read(KEYS.USERS, []);
   const saveUsers = u => write(KEYS.USERS, u);
   const getSession = () => read(KEYS.SESSION, null);
   const setSession = u => write(KEYS.SESSION, u ? { id:u.id, email:u.email, name:u.name, role:u.role, business:u.business } : null);
-  const currentUser = () => { const s = getSession(); if(!s) return null; const u = getUsers().find(x=>x.id===s.id); return u || null; };
 
-  const register = ({name,email,password,business}) => {
+  /* Session hiện tại (cache). Khi dùng Supabase, session lấy từ Supabase. */
+  let cachedUser = null;
+  const currentUser = () => cachedUser !== null
+    ? cachedUser
+    : (() => { const s = getSession(); if(!s) return null; return getUsers().find(x=>x.id===s.id) || null; })();
+
+  /* Khôi phục phiên khi load trang — chỉ dùng cho Supabase.
+     Nếu chưa cấu hình Supabase, giữ nguyên session localStorage. */
+  const restoreSession = async () => {
+    if(isSupabase()){
+      const u = await window.SupabaseAuth.getSession();
+      cachedUser = u;
+    }
+  };
+
+  const register = async ({name,email,password,business}) => {
+    if(isSupabase()){
+      const r = await window.SupabaseAuth.register({ name, email, password, business });
+      if(r.ok){ cachedUser = r.user; setSession(r.user); }
+      return r;
+    }
     const users = getUsers();
     if(users.some(u=>u.email===email)) return { ok:false, msg:"Email đã tồn tại." };
     const u = { id: Date.now(), name, email, phone:"", address:"", password, role:"user", business:!!business };
-    users.push(u); saveUsers(users); setSession(u);
+    users.push(u); saveUsers(users); setSession(u); cachedUser = null;
     return { ok:true, user:u };
   };
-  const login = ({email,password}) => {
+  const login = async ({email,password}) => {
+    if(isSupabase()){
+      const r = await window.SupabaseAuth.login({ email, password });
+      if(r.ok){ cachedUser = r.user; setSession(r.user); }
+      return r;
+    }
     const u = getUsers().find(x=>x.email===email && x.password===password);
     if(!u) return { ok:false, msg:"Email hoặc mật khẩu không đúng." };
-    setSession(u); return { ok:true, user:u };
+    setSession(u); cachedUser = null; return { ok:true, user:u };
   };
-  const logout = () => setSession(null);
-  const updateProfile = data => {
+  const logout = async () => {
+    cachedUser = null;
+    if(isSupabase()) await window.SupabaseAuth.logout();
+    setSession(null);
+  };
+  const updateProfile = async data => {
+    if(isSupabase()){
+      const r = await window.SupabaseAuth.updateProfile(data);
+      if(r.ok) cachedUser = r.user;
+      return r;
+    }
     const users = getUsers(); const u = currentUser(); if(!u) return { ok:false, msg:"Chưa đăng nhập." };
     const idx = users.findIndex(x=>x.id===u.id); if(idx<0) return { ok:false,msg:"Không tìm thấy tài khoản." };
-    if(data.password){ const dup = users.find(x=>x.email===data.email && x.id!==u.id); if(dup) return { ok:false,msg:"Email đã được dùng." }; }
     users[idx] = { ...users[idx], ...data, password: data.password || users[idx].password };
-    saveUsers(users); setSession(users[idx]); return { ok:true, user:users[idx] };
+    saveUsers(users); setSession(users[idx]); cachedUser = null; return { ok:true, user:users[idx] };
   };
 
   /* ---------- CART ---------- */
@@ -90,7 +124,7 @@ const Store = (() => {
 
   return { init, KEYS, ADMIN_EMAIL,
     getBooks, saveBooks, findBook, nextBookId, addBook, updateBook, deleteBook,
-    getUsers, saveUsers, getSession, setSession, currentUser, register, login, logout, updateProfile,
+    getUsers, saveUsers, getSession, setSession, currentUser, restoreSession, register, login, logout, updateProfile,
     getCart, saveCart, cartCount, cartTotal, addToCart, cartItemQty, setCartQty, removeFromCart, clearCart,
     getOrders, saveOrders, placeOrder, setOrderStatus };
 })();

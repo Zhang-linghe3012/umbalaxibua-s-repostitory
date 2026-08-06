@@ -267,7 +267,7 @@
       ${u.role==="admin" ? `<button class="btn btn-outline btn-sm" data-gadmin>Quản trị</button>` : ""}
       <button class="link-btn" data-logout>Đăng xuất</button>`;
     const adm = box.querySelector("[data-gadmin]"); if(adm) adm.onclick=()=>showView("admin");
-    const lg = box.querySelector("[data-logout]"); if(lg) lg.onclick=()=>{ S.logout(); toast("Đã đăng xuất"); renderUserBox(); showView("home"); };
+    const lg = box.querySelector("[data-logout]"); if(lg) lg.onclick=async ()=>{ await S.logout(); toast("Đã đăng xuất"); renderUserBox(); showView("home"); };
   }
 
   /* ===== Bind UI ===== */
@@ -305,29 +305,29 @@
     });
 
     // login form
-    $("loginForm").addEventListener("submit", e=>{
+    $("loginForm").addEventListener("submit", async e => {
       e.preventDefault();
       const f = new FormData(e.target);
-      const r = S.login({ email: f.get("email"), password: f.get("password") });
+      const r = await S.login({ email: f.get("email"), password: f.get("password") });
       if(!r.ok){ e.target.querySelector(".form-note").textContent = r.msg; return; }
       closeModal("modalAuth"); toast("Đăng nhập thành công, chào "+r.user.name+"!"); renderUserBox();
       if(r.user.role==="admin") showView("admin"); else showView("home");
     });
     // register form
-    $("registerForm").addEventListener("submit", e=>{
+    $("registerForm").addEventListener("submit", async e => {
       e.preventDefault();
       const f = new FormData(e.target);
       const note = e.target.querySelector(".form-note");
       if(f.get("password")!==f.get("confirm")){ note.textContent="Mật khẩu không khớp."; return; }
-      const r = S.register({ name:f.get("name"), email:f.get("email"), password:f.get("password"), business:!!f.get("business") });
+      const r = await S.register({ name:f.get("name"), email:f.get("email"), password:f.get("password"), business:!!f.get("business") });
       if(!r.ok){ note.textContent = r.msg; return; }
       closeModal("modalAuth"); toast("Đăng ký thành công. Chào "+r.user.name+"!"); renderUserBox(); showView("home");
     });
     // profile form
-    $("profileForm").addEventListener("submit", e=>{
+    $("profileForm").addEventListener("submit", async e => {
       e.preventDefault();
       const u = S.currentUser(); if(!u){ toast("Chưa đăng nhập", true); return; }
-      const r = S.updateProfile({ name: $("pName").value, phone: $("pPhone").value, address: $("pAddress").value, password: $("pPassword").value || null });
+      const r = await S.updateProfile({ name: $("pName").value, phone: $("pPhone").value, address: $("pAddress").value, password: $("pPassword").value || null });
       if(r.ok){ toast("Đã lưu hồ sơ"); renderUserBox(); } else toast(r.msg, true);
     });
     // checkout form
@@ -358,5 +358,5 @@
   }
 
   bindUI();
-  showView("home");
+  S.restoreSession().then(() => showView("home"));
 })();
