@@ -7,7 +7,8 @@ const Store = (() => {
   const write = (k, v) => localStorage.setItem(k, JSON.stringify(v));
 
   const init = () => {
-    if(!localStorage.getItem(KEYS.BOOKS)) write(KEYS.BOOKS, SEED_BOOKS);
+    const storedBooks = read(KEYS.BOOKS, null);
+    if(!Array.isArray(storedBooks) || storedBooks.length === 0) write(KEYS.BOOKS, SEED_BOOKS);
     if(!localStorage.getItem(KEYS.USERS)){
       write(KEYS.USERS, [{ id:1, name:"Quản trị viên", email:ADMIN_EMAIL, phone:"", address:"", password:"admin123", role:"admin", business:true }]);
     }
@@ -41,8 +42,12 @@ const Store = (() => {
      Nếu chưa cấu hình Supabase, giữ nguyên session localStorage. */
   const restoreSession = async () => {
     if(isSupabase()){
-      const u = await window.SupabaseAuth.getSession();
-      cachedUser = u;
+      try {
+        const u = await window.SupabaseAuth.getSession();
+        cachedUser = u;
+      } catch(e){
+        cachedUser = null;
+      }
     }
   };
 

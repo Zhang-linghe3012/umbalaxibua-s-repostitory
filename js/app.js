@@ -22,11 +22,13 @@
       const el = $(("view-"+x)); if(el) el.hidden = (x !== v);
     });
     window.scrollTo({top:0});
-    if(v==="home") renderHome();
-    else if(v==="products") renderProducts();
-    else if(v==="orders") renderOrders();
-    else if(v==="profile") renderProfile();
-    else if(v==="admin") renderAdmin();
+    try{
+      if(v==="home") renderHome();
+      else if(v==="products") renderProducts();
+      else if(v==="orders") renderOrders();
+      else if(v==="profile") renderProfile();
+      else if(v==="admin") renderAdmin();
+    }catch(err){ console.error("renderView error:", err); }
     renderUserBox();
   }
 
@@ -358,5 +360,5 @@
   }
 
   bindUI();
-  S.restoreSession().then(() => showView("home"));
+  S.restoreSession().catch(()=>{}).then(() => showView("home"));
 })();
