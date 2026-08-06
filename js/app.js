@@ -7,7 +7,7 @@
   let rq = "";
 
   const STATUS_META = { new:"Mới đặt", processing:"Đang xử lý", shipped:"Đang giao", completed:"Hoàn thành", cancelled:"Đã hủy" };
-  const cover = b => { const c = (b.img && b.img.startsWith("http")) ? b.img : (b.img || "📚"); return c.startsWith("http") ? `<img src="${esc(c)}" alt="">` : esc(c); };
+  const cover = b => { const img = b && b.img; const c = (typeof img==="string") ? img : "📚"; return c.startsWith("http") ? `<img src="${esc(c)}" alt="">` : esc(c); };
   const discountOf = b => (b.oldPrice && b.oldPrice > b.price) ? Math.round((1 - b.price/b.oldPrice)*100) : 0;
 
   /* ===== Toast ===== */
@@ -34,21 +34,25 @@
 
   /* ===== Product card ===== */
   function bookCard(b){
-    const off = discountOf(b);
-    return `<div class="product-card" data-detail="${b.id}">
-      ${off ? `<span class="discount-tag">-${off}%</span>` : ""}
-      <div class="book-cover" style="font-size:64px">${cover(b)}</div>
-      <div class="product-body">
-        <div class="product-title">${esc(b.title)}</div>
-        <div class="product-author">${esc(b.author)}</div>
-        <div class="product-rating">★★★★★ ${b.rating||0} · ${b.reviews||0} đánh giá</div>
-        <div class="product-price">
-          <span class="price">${fmt(b.price)}</span>
-          ${off?`<span class="old-price">${fmt(b.oldPrice)}</span>`:""}
+    let off = 0;
+    try{
+      if(!b || b.title==null) return "";
+      off = discountOf(b);
+      return `<div class="product-card" data-detail="${b.id}">
+        ${off ? `<span class="discount-tag">-${off}%</span>` : ""}
+        <div class="book-cover" style="font-size:64px">${cover(b)}</div>
+        <div class="product-body">
+          <div class="product-title">${esc(b.title)}</div>
+          <div class="product-author">${esc(b.author)}</div>
+          <div class="product-rating">★★★★★ ${b.rating||0} · ${b.reviews||0} đánh giá</div>
+          <div class="product-price">
+            <span class="price">${fmt(b.price)}</span>
+            ${off?`<span class="old-price">${fmt(b.oldPrice)}</span>`:""}
+          </div>
+          <div class="product-actions"><button class="btn btn-accent btn-sm" data-cart="${b.id}">🛒 Thêm vào giỏ</button></div>
         </div>
-        <div class="product-actions"><button class="btn btn-accent btn-sm" data-cart="${b.id}">🛒 Thêm vào giỏ</button></div>
-      </div>
-    </div>`;
+      </div>`;
+    }catch(err){ console.error("bookCard error:", err, b); return ""; }
   }
   function bindProduct(root){
     root.querySelectorAll("[data-detail]").forEach(c=>c.onclick=()=>openDetail(Number(c.dataset.detail)));
@@ -106,7 +110,7 @@
     const list = S.getBooks().filter(b =>
       ($("filterCategory").value==="all" || b.category===$("filterCategory").value) &&
       (!$("onlySale").checked || discountOf(b)>0) &&
-      (rq==="" || b.title.toLowerCase().includes(rq) || b.author.toLowerCase().includes(rq) || b.category.toLowerCase().includes(rq))
+      (rq==="" || (b.title||"").toLowerCase().includes(rq) || (b.author||"").toLowerCase().includes(rq) || (b.category||"").toLowerCase().includes(rq))
     );
     const price = $("filterPrice").value;
     if(price!=="all"){ const [lo,hi]=price.split("-").map(Number); const f=list.filter(b=>b.price>=lo&&b.price<=hi); list.length=0; list.push(...f); }
