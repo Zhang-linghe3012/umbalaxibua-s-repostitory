@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hiệu Sách & Kinh doanh - BookConnect</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header">
+    <div class="container header-inner">
+      <a href="#" class="brand" data-nav="home">
+        <span class="brand-logo">📚</span>
+        <span class="brand-name">Book<em>Connect</em></span>
+      </a>
+      <nav class="main-nav" id="mainNav">
+        <a href="#" data-nav="home">Trang chủ</a>
+        <a href="#" data-nav="products">Sản phẩm</a>
+        <a href="#" data-nav="about">Về chúng tôi</a>
+        <a href="#" data-nav="contact">Liên hệ</a>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" id="btnSearch" title="Tìm kiếm">🔍</button>
+        <a href="#" class="icon-btn" data-nav="orders" title="Đơn hàng">📦</a>
+        <button class="icon-btn" id="btnCart" title="Giỏ hàng">🛒<span class="badge" id="cartCount">0</span></button>
+        <div class="user-box" id="userBox"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== SEARCH BAR ===== -->
+  <div class="search-bar" id="searchBar" hidden>
+    <div class="container search-inner">
+      <input type="search" id="searchInput" placeholder="Tìm kiếm sách theo tên, tác giả, thể loại...">
+      <button class="btn btn-primary" id="btnSearchGo">Tìm</button>
+    </div>
+  </div>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="container" id="app">
+
+    <!-- VIEW: HOME -->
+    <section class="view" id="view-home">
+      <div class="hero">
+        <div class="hero-text">
+          <h1>Hiệu sách số dành cho <span>doanh nghiệp & nhà quản trị</span></h1>
+          <p>Hơn 10.000 đầu sách kinh doanh, quản trị, khởi nghiệp và phát triển bản thân. Giao nhanh toàn quốc, thanh toán an toàn.</p>
+          <div class="hero-actions">
+            <a href="#" class="btn btn-primary" data-nav="products">Mua sách ngay</a>
+            <a href="#" class="btn btn-outline" data-nav="about">Tìm hiểu thêm</a>
+          </div>
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><strong>10.000+</strong><span>Đầu sách</span></div>
+          <div class="stat"><strong>50.000+</strong><span>Khách hàng</span></div>
+          <div class="stat"><strong>4.9/5</strong><span>Đánh giá</span></div>
+          <div class="stat"><strong>24h</strong><span>Giao hỏa tốc</span></div>
+        </div>
+      </div>
+
+      <div class="category-strip" id="categoryStrip"></div>
+
+      <div class="section-head">
+        <h2>Sách nổi bật</h2>
+        <a href="#" data-nav="products">Xem tất cả →</a>
+      </div>
+      <div class="product-grid" id="featuredGrid"></div>
+
+      <div class="section-head">
+        <h2>Khuyến mãi hôm nay</h2>
+        <a href="#" data-nav="products">Xem tất cả →</a>
+      </div>
+      <div class="product-grid" id="saleGrid"></div>
+
+      <div class="promo-banner">
+        <div>
+          <h3>Đăng ký tài khoản doanh nghiệp</h3>
+          <p>Hóa đơn VAT, chiết khấu theo số lượng, quản lý đơn hàng tập trung.</p>
+        </div>
+        <a href="#" class="btn btn-light" data-action="open-register">Đăng ký ngay</a>
+      </div>
+    </section>
+
+    <!-- VIEW: PRODUCTS -->
+    <section class="view" id="view-products" hidden>
+      <div class="products-layout">
+        <aside class="filters">
+          <h3>Bộ lọc</h3>
+          <label>Danh mục</label>
+          <select id="filterCategory"><option value="all">Tất cả</option></select>
+          <label>Khoảng giá</label>
+          <select id="filterPrice">
+            <option value="all">Tất cả</option>
+            <option value="0-100">Dưới 100.000đ</option>
+            <option value="100-300">100.000đ - 300.000đ</option>
+            <option value="300-600">300.000đ - 600.000đ</option>
+            <option value="600-999999">Trên 600.000đ</option>
+          </select>
+          <label>Xếp theo</label>
+          <select id="sortBy">
+            <option value="default">Mặc định</option>
+            <option value="price-asc">Giá tăng dần</option>
+            <option value="price-desc">Giá giảm dần</option>
+            <option value="rating">Đánh giá cao</option>
+            <option value="newest">Mới nhất</option>
+          </select>
+          <label><input type="checkbox" id="onlySale"> Chỉ sách giảm giá</label>
+          <button class="btn btn-outline btn-block" id="btnResetFilter">Đặt lại</button>
+        </aside>
+        <div class="products-main">
+          <div class="products-toolbar">
+            <span id="resultCount">0 sản phẩm</span>
+          </div>
+          <div class="product-grid" id="productGrid"></div>
+          <div class="empty-state" id="productEmpty" hidden>
+            <p>😕 Không tìm thấy sách phù hợp</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW: PRODUCT DETAIL -->
+    <section class="view" id="view-detail" hidden></section>
+
+    <!-- VIEW: ABOUT -->
+    <section class="view" id="view-about" hidden>
+      <div class="page-hero">
+        <h1>Về BookConnect</h1>
+        <p>Đối tác tri thức đáng tin cậy cho cá nhân và doanh nghiệp Việt Nam.</p>
+      </div>
+      <div class="about-grid">
+        <div class="about-card"><h3>🎯 Sứ mệnh</h3><p>Mang tri thức kinh doanh đến gần hơn với người Việt, giúp doanh nghiệp phát triển bền vững.</p></div>
+        <div class="about-card"><h3>🏢 Kênh doanh nghiệp</h3><p>Tư vấn chọn sách theo nhu cầu công ty, hóa đơn VAT, chiết khấu số lượng lớn, giao hàng đến văn phòng.</p></div>
+        <div class="about-card"><h3>⚡ Dịch vụ</h3><p>Giao hỏa tốc 24h tại Hà Nội & TP.HCM, đổi trả trong 7 ngày, thanh toán đa kênh.</p></div>
+        <div class="about-card"><h3>🤝 Đối tác</h3><p>Liên kết với hơn 100 nhà xuất bản lớn trong và ngoài nước như NXB Trẻ, Kim Đồng, Alpha Books.</p></div>
+      </div>
+    </section>
+
+    <!-- VIEW: CONTACT -->
+    <section class="view" id="view-contact" hidden>
+      <div class="page-hero">
+        <h1>Liên hệ & Hỗ trợ</h1>
+        <p>Chúng tôi luôn sẵn sàng hỗ trợ bạn mọi lúc.</p>
+      </div>
+      <div class="contact-grid">
+        <form class="contact-form" id="contactForm">
+          <h3>Gửi yêu cầu</h3>
+          <input type="text" name="name" placeholder="Họ và tên" required>
+          <input type="email" name="email" placeholder="Email" required>
+          <textarea name="msg" rows="4" placeholder="Nội dung yêu cầu" required></textarea>
+          <button class="btn btn-primary" type="submit">Gửi yêu cầu</button>
+          <p class="form-note" id="contactNote"></p>
+        </form>
+        <div class="contact-info">
+          <p><strong>🏢 Văn phòng:</strong> Tầng 5, 123 Trần Hưng Đạo, Hoàn Kiếm, Hà Nội</p>
+          <p><strong>📞 Hotline:</strong> 1900 6868</p>
+          <p><strong>✉️ Email:</strong> hotro@bookconnect.vn</p>
+          <p><strong>🕘 Giờ làm việc:</strong> 8h - 21h tất cả các ngày</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW: ORDERS -->
+    <section class="view" id="view-orders" hidden>
+      <div class="page-hero">
+        <h1>Đơn hàng của tôi</h1>
+        <p id="ordersUserNote"></p>
+      </div>
+      <div id="ordersList"></div>
+      <div class="empty-state" id="ordersEmpty" hidden>
+        <p>📦 Bạn chưa có đơn hàng nào.</p>
+        <a href="#" class="btn btn-primary" data-nav="products">Mua sắm ngay</a>
+      </div>
+    </section>
+
+    <!-- VIEW: PROFILE -->
+    <section class="view" id="view-profile" hidden>
+      <div class="page-hero"><h1>Tài khoản của tôi</h1></div>
+      <form class="card form" id="profileForm">
+        <h3>Thông tin cá nhân</h3>
+        <input type="text" id="pName" placeholder="Họ và tên">
+        <input type="text" id="pPhone" placeholder="Số điện thoại">
+        <input type="text" id="pAddress" placeholder="Địa chỉ nhận hàng">
+        <input type="password" id="pPassword" placeholder="Mật khẩu mới (để trống nếu không đổi)">
+        <button class="btn btn-primary" type="submit">Lưu thay đổi</button>
+      </form>
+    </section>
+
+    <!-- VIEW: ADMIN -->
+    <section class="view" id="view-admin" hidden>
+      <div class="page-hero">
+        <h1>Quản trị doanh nghiệp</h1>
+        <p>Quản lý sách, đơn hàng và thống kê kinh doanh.</p>
+      </div>
+      <div class="admin-tabs">
+        <button class="tab-btn active" data-tab="stats">📊 Thống kê</button>
+        <button class="tab-btn" data-tab="books">📚 Quản lý sách</button>
+        <button class="tab-btn" data-tab="orders">🧾 Quản lý đơn hàng</button>
+        <button class="tab-btn" data-tab="users">👥 Khách hàng</button>
+      </div>
+      <div class="admin-panel" id="admin-stats">
+        <div class="stats-grid">
+          <div class="stat-card"><strong id="stRevenue">0đ</strong><span>Doanh thu</span></div>
+          <div class="stat-card"><strong id="stOrders">0</strong><span>Đơn hàng</span></div>
+          <div class="stat-card"><strong id="stBooks">0</strong><span>Sách trong kho</span></div>
+          <div class="stat-card"><strong id="stUsers">0</strong><span>Khách hàng</span></div>
+        </div>
+        <div class="stat-card wide">
+          <h3>Top sách bán chạy</h3>
+          <ul id="topBooks"></ul>
+        </div>
+      </div>
+      <div class="admin-panel" id="admin-books" hidden>
+        <div class="admin-toolbar">
+          <button class="btn btn-primary" id="btnAddBook">+ Thêm sách</button>
+        </div>
+        <table class="table">
+          <thead><tr><th>Tên sách</th><th>Danh mục</th><th>Giá</th><th>Giảm %</th><th>Tồn kho</th><th>Hành động</th></tr></thead>
+          <tbody id="adminBookRows"></tbody>
+        </table>
+      </div>
+      <div class="admin-panel" id="admin-orders" hidden>
+        <table class="table">
+          <thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Sản phẩm</th><th>Tổng</th><th>Trạng thái</th></tr></thead>
+          <tbody id="adminOrderRows"></tbody>
+        </table>
+      </div>
+      <div class="admin-panel" id="admin-users" hidden>
+        <table class="table">
+          <thead><tr><th>Tên</th><th>Email</th><th>Điện thoại</th><th>Loại</th></tr></thead>
+          <tbody id="adminUserRows"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div>
+        <div class="brand"><span class="brand-logo">📚</span><span class="brand-name">Book<em>Connect</em></span></div>
+        <p>Đối tác tri thức cho cá nhân và doanh nghiệp Việt Nam.</p>
+      </div>
+      <div>
+        <h4>Hỗ trợ</h4>
+        <a href="#" data-nav="contact">Liên hệ</a>
+        <a href="#">Chính sách đổi trả</a>
+        <a href="#">Điều khoản sử dụng</a>
+      </div>
+      <div>
+        <h4>Doanh nghiệp</h4>
+        <a href="#" data-nav="contact">Mua số lượng lớn</a>
+        <a href="#">Hợp tác NXB</a>
+        <a href="#">Đăng ký kênh doanh nghiệp</a>
+      </div>
+      <div>
+        <h4>Theo dõi</h4>
+        <p>Facebook • Zalo • YouTube • TikTok</p>
+        <p class="hotline">📞 1900 6868</p>
+      </div>
+    </div>
+    <div class="container copyright">© 2026 BookConnect. Toàn bộ quyền được bảo lưu.</div>
+  </footer>
+
+  <!-- ===== MODALS ===== -->
+  <div class="modal" id="modalAuth" hidden>
+    <div class="modal-box">
+      <button class="modal-close" data-close="modalAuth">✕</button>
+      <div class="auth-tabs">
+        <button class="tab-btn active" data-atab="login">Đăng nhập</button>
+        <button class="tab-btn" data-atab="register">Đăng ký</button>
+      </div>
+      <form id="loginForm" class="form">
+        <h3>Đăng nhập</h3>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Mật khẩu" required>
+        <button class="btn btn-primary btn-block" type="submit">Đăng nhập</button>
+        <p class="form-note"></p>
+      </form>
+      <form id="registerForm" class="form" hidden>
+        <h3>Đăng ký tài khoản</h3>
+        <input type="text" name="name" placeholder="Họ và tên" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Mật khẩu (tối thiểu 6 ký tự)" minlength="6" required>
+        <input type="password" name="confirm" placeholder="Nhập lại mật khẩu" required>
+        <label class="check"><input type="checkbox" name="business"> Tôi đăng ký tài khoản doanh nghiệp (hóa đơn VAT, chiết khấu)</label>
+        <button class="btn btn-primary btn-block" type="submit">Đăng ký</button>
+        <p class="form-note"></p>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="modalCart" hidden>
+    <div class="modal-box modal-lg">
+      <button class="modal-close" data-close="modalCart">✕</button>
+      <h3>🛒 Giỏ hàng của bạn</h3>
+      <div id="cartItems"></div>
+      <div class="cart-footer">
+        <div class="cart-total">Tạm tính: <strong id="cartTotal">0đ</strong></div>
+        <button class="btn btn-primary" id="btnCheckout">Thanh toán</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="modalCheckout" hidden>
+    <div class="modal-box modal-lg">
+      <button class="modal-close" data-close="modalCheckout">✕</button>
+      <h3>🧾 Thanh toán đơn hàng</h3>
+      <form id="checkoutForm" class="form">
+        <div class="row">
+          <input type="text" id="cName" placeholder="Họ và tên người nhận" required>
+          <input type="tel" id="cPhone" placeholder="Số điện thoại" required>
+        </div>
+        <input type="text" id="cAddress" placeholder="Địa chỉ giao hàng" required>
+        <label>Phương thức thanh toán</label>
+        <select id="cPayment">
+          <option value="cod">Thanh toán khi nhận hàng (COD)</option>
+          <option value="transfer">Chuyển khoản ngân hàng</option>
+          <option value="momo">Ví MoMo</option>
+        </select>
+        <div class="order-summary" id="checkoutSummary"></div>
+        <button class="btn btn-primary btn-block" type="submit">Xác nhận đặt hàng</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="modalBook" hidden>
+    <div class="modal-box modal-lg">
+      <button class="modal-close" data-close="modalBook">✕</button>
+      <h3 id="bookModalTitle">Thêm sách</h3>
+      <form id="bookForm" class="form">
+        <input type="hidden" id="bId">
+        <input type="text" id="bTitle" placeholder="Tên sách" required>
+        <input type="text" id="bAuthor" placeholder="Tác giả" required>
+        <select id="bCategory"></select>
+        <div class="row">
+          <input type="number" id="bPrice" placeholder="Giá (VND)" min="0" required>
+          <input type="number" id="bOldPrice" placeholder="Giá gốc (VND)" min="0">
+        </div>
+        <div class="row">
+          <input type="number" id="bStock" placeholder="Tồn kho" min="0" value="10" required>
+          <input type="text" id="bImage" placeholder="URL ảnh bìa">
+        </div>
+        <textarea id="bDesc" rows="3" placeholder="Mô tả ngắn"></textarea>
+        <button class="btn btn-primary btn-block" type="submit">Lưu sách</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
